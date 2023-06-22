@@ -1,24 +1,25 @@
 const std = @import("std");
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var file = try std.fs.cwd().openFile("src/input.txt", .{});
+    defer file.close();
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    var buf_reader = std.io.bufferedReader(file.reader());
+    var buf: [1024]u8 = undefined;
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
-    try bw.flush(); // don't forget to flush!
+    while (try buf_reader.reader().readUntilDelimiterOrEof(&buf, '\n')) |lineWithCR| {
+        var line = std.mem.split(u8, std.mem.trim(u8, lineWithCR, "\r"), " ");
+        const firstLetter: []const u8 = line.next().?;
+        const secondLetter: []const u8 = line.next().?;
+        std.log.info("{any}", .{line});
+        std.log.info("{s}", .{secondLetter});
+        std.log.info("{s}", .{firstLetter});
+        // if (line.len < 4) break;
+        // const firstLetter = line[0];
+        // const secondLetter = line[0];
+    }
 }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
+// pub fn getLine(lineWithCR: []const u8) SplitIterator(u8) {
+//     return std.mem.split(u8, std.mem.trim(u8, lineWithCR, "\r"), " ");
+// }
