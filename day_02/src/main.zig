@@ -7,13 +7,21 @@ pub fn main() !void {
     var buf_reader = std.io.bufferedReader(file.reader());
     var buf: [1024]u8 = undefined;
 
+    // Ok, doing it by matrix is the right way.
     while (try buf_reader.reader().readUntilDelimiterOrEof(&buf, '\n')) |lineWithCR| {
         var line = std.mem.split(u8, std.mem.trim(u8, lineWithCR, "\r"), " ");
-        const firstLetter: []const u8 = line.next().?;
-        const secondLetter: []const u8 = line.next().?;
-        std.log.info("{any}", .{line});
-        std.log.info("{s}", .{secondLetter});
-        std.log.info("{s}", .{firstLetter});
+        // std.log.info("{any}", .{line});
+        const first_letter: []const u8 = line.next() orelse "";
+        const second_letter: []const u8 = line.next() orelse "";
+        const op_value: []const u8 = switch (first_letter[0]) {
+            'A' => "Rock",
+            'B' => "Paper",
+            'C' => "Scissor",
+            else => unreachable,
+        };
+
+        std.log.info("Opponent choose: {s}", .{op_value});
+        std.log.info("I choose: {s}", .{second_letter});
         // if (line.len < 4) break;
         // const firstLetter = line[0];
         // const secondLetter = line[0];
