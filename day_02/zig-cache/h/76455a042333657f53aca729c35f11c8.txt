@@ -1,9 +1,9 @@
-1150 844424932851944 1687483928636203000 81b443ef7d32729b19e6b0a8d2f1512b C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
-1150 844424932851944 1687483928636203000 81b443ef7d32729b19e6b0a8d2f1512b C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
+2087 6473924466684646 1687578331001859900 93f49051b6ada6a6af3744a142453e71 C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
+2087 6473924466684646 1687578331001859900 93f49051b6ada6a6af3744a142453e71 C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
 5621 1688849862567168 1674086960000000000 66001e1a55f68e4681c1f32a69223647 C:\Users\Cliente\scoop\apps\zig\current\lib\std\std.zig
 5621 1688849862567168 1674086960000000000 66001e1a55f68e4681c1f32a69223647 C:\Users\Cliente\scoop\apps\zig\current\lib\std\std.zig
 24345 1407374885856499 1674086960000000000 62880d6cfcae34387545ced4cffbd605 C:\Users\Cliente\scoop\apps\zig\current\lib\std\start.zig
-1150 844424932851944 1687483928636203000 81b443ef7d32729b19e6b0a8d2f1512b C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
+2087 6473924466684646 1687578331001859900 93f49051b6ada6a6af3744a142453e71 C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\src\main.zig
 2262 19703248369963276 1687399104792285400 d8ada236138b7190ca90aa3dcc4df001 C:\Users\Cliente\Documents\Projects\Zig\advent_of_code_zig_2022\day_02\zig-cache\o\1777e5ebc684e690b2f5af5589700ab3\builtin.zig
 30315 1407374885856315 1674086960000000000 57ad780aea8cfecc2df8b9f237c95642 C:\Users\Cliente\scoop\apps\zig\current\lib\std\builtin.zig
 65579 1407374885856530 1674086960000000000 de4ed4ac038e061fe21f7118a8e1c089 C:\Users\Cliente\scoop\apps\zig\current\lib\std\target.zig
