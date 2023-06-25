@@ -1,24 +1,41 @@
 const std = @import("std");
+const ArrayList = std.ArrayList;
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    const allocator = std.heap.page_allocator;
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    var list = ArrayList(ArrayList(u8)).init(allocator);
+    defer list.deinit();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    var file = try std.fs.cwd().openFile("src/input.txt", .{});
+    defer file.close();
 
-    try bw.flush(); // don't forget to flush!
+    var buf_reader = std.io.bufferedReader(file.reader());
+    var buf: [1024]u8 = undefined;
+
+    while (try buf_reader.reader().readUntilDelimiterOrEof(&buf, '\n')) |line| {
+        const value = ArrayList(u8).init(allocator);
+        const origin = std.mem.trim(u8, line, "\r");
+        try value.append(origin[0..origin.len]);
+        // for (origin) |originChar| {
+        //     std.log.info("{}", .{@typeInfo(@TypeOf(originChar))});
+        //     value.append(originChar);
+        // }
+        // value.append(origin[0..origin.len]);
+        try list.append(value);
+    }
+
+    for (list.items) |itemsList| {
+        std.log.info("3 {any}", .{itemsList.items});
+    }
+
+    // std.log.info("3 {any}", .{list.items});
+    // for (list.items) |line| {
+    //     std.log.info("{any}", .{line});
+    // }
 }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
+// export fn getArrayListFromFile(fileName: []const u8) !std.ArrayList([]const u8) {
+//
+//     return list;
+// }

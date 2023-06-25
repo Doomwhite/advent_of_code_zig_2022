@@ -11,10 +11,13 @@ pub fn build(b: *std.build.Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
+    const utils = b.createModule(.{ .source_file = .{ .path = "utils/utils.zig" } });
+    // const utils = b.addModule("utils", .{ .source_file = .{ .path = "utils/utils.zig" } });
     const exe = b.addExecutable("aoc_zig_01", "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
+    exe.addModule("utils", utils);
 
     const run_cmd = exe.run();
     run_cmd.step.dependOn(b.getInstallStep());
