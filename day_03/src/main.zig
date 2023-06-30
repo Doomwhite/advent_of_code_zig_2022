@@ -3,10 +3,40 @@ const utils = @import("utils");
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 const ArrayListAligned = std.ArrayListAligned;
+const ComptimeStringMap = std.ComptimeStringMap;
 
-const lower_case_items = [_]u8{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+const lower_case_map = ComptimeStringMap(u8, .{
+    .{ "a", 1 },
+    .{ "b", 2 },
+    .{ "c", 3 },
+    .{ "d", 4 },
+    .{ "e", 5 },
+    .{ "f", 6 },
+    .{ "g", 7 },
+    .{ "h", 8 },
+    .{ "i", 9 },
+    .{ "j", 10 },
+    .{ "k", 11 },
+    .{ "l", 12 },
+    .{ "m", 13 },
+    .{ "n", 14 },
+    .{ "o", 15 },
+    .{ "p", 16 },
+    .{ "q", 17 },
+    .{ "r", 18 },
+    .{ "s", 19 },
+    .{ "t", 20 },
+    .{ "u", 21 },
+    .{ "v", 22 },
+    .{ "w", 23 },
+    .{ "x", 24 },
+    .{ "y", 25 },
+    .{ "z", 26 },
+});
 
-const upper_case_items = [_]u8{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+// const lower_case_items = [_]u8{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+//
+// const upper_case_items = [_]u8{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
 pub fn main() !void {
     var allocator = std.heap.page_allocator;
@@ -27,6 +57,7 @@ pub fn main() !void {
         // var first_half = ;
     }
 
+    std.log.info("{}", .{lower_case_map});
     // std.log.info("{s}", .{list.items});
     // std.log.info("{any}", .{list.items});
     // std.log.info("{any}", .{@TypeOf(lower_case_items)});
@@ -41,7 +72,10 @@ fn checkValues(total_value: *u32, source: []const u8, target: u8) void {
         if (item == target) {
             std.debug.print("{any}\n", .{item});
             total_value.* += 1;
-            list.append(item);
+            if (lower_case_map.has(item)) {
+                std.log.info("", .{lower_case_map.get(item)});
+            }
+            // list.append(item);
         }
     }
 }
