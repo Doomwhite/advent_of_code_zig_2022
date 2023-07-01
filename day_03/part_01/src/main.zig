@@ -5,7 +5,7 @@ const ArrayList = std.ArrayList;
 const ArrayListAligned = std.ArrayListAligned;
 const ComptimeStringMap = std.ComptimeStringMap;
 
-const lower_case_items = [_]u8{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+const priority_item_list = [_]u8{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
 pub fn main() !void {
     var allocator = std.heap.page_allocator;
@@ -14,24 +14,18 @@ pub fn main() !void {
     defer list.deinit();
 
     var total_value: u32 = 0;
-    var alreadyCheckedList = ArrayList(u32).init(allocator);
-    defer alreadyCheckedList.deinit();
     for (list.items) |line| {
-        alreadyCheckedList = ArrayList(u32).init(allocator);
-        var first_half = line[0 .. line.len / 2];
-        var second_half = line[line.len / 2 .. line.len];
+        var alreadyCheckedList = ArrayList(u32).init(allocator);
+        defer alreadyCheckedList.deinit();
+
+        var first_half: []const u8 = line[0 .. line.len / 2];
+        var second_half: []const u8 = line[line.len / 2 .. line.len];
         for (first_half) |first_half_item| {
             try checkValues(&alreadyCheckedList, &total_value, second_half, first_half_item);
         }
         log_line_info(total_value, line, first_half, second_half);
     }
 
-    std.debug.print("alreadyCheckedList: {any}\n", .{alreadyCheckedList.items});
-    for (alreadyCheckedList.items) |index| {
-        if (index <= 52) {
-            std.debug.print("{c}\n", .{lower_case_items[index]});
-        }
-    }
     std.log.info("{d}", .{total_value});
 }
 
@@ -42,15 +36,11 @@ fn checkValues(alreadyCheckedList: *ArrayListAligned(u32, null), total_value: *u
 
     for (source) |item| {
         if (item == target) {
-            const teste1 = @as(u32, @intCast(getIndexFromArray(lower_case_items, item)));
-            if (teste1 <= lower_case_items.len - 1) {
-                std.debug.print("Teste1: {c}\n", .{lower_case_items[teste1]});
-            }
-            const lower_case_value = @as(u32, @intCast(getIndexFromArray(lower_case_items, item)));
+            const list_index_value = @intCast(u32, getIndexFromArray(priority_item_list, item));
 
-            if (!contains(alreadyCheckedList, lower_case_value)) {
-                total_value.* += lower_case_value + 1;
-                try alreadyCheckedList.*.append(lower_case_value);
+            if (!contains(alreadyCheckedList, list_index_value)) {
+                total_value.* += list_index_value + 1;
+                try alreadyCheckedList.*.append(list_index_value);
             }
         }
     }
