@@ -21,8 +21,8 @@ pub fn main() !void {
     var total_value: u32 = 0;
     var index: u64 = 0;
     for (three_line_list.items) |three_line_item| {
-        var alreadyCheckedList = ArrayList(u32).init(allocator);
-        defer alreadyCheckedList.deinit();
+        var already_checked_list = ArrayList(u32).init(allocator);
+        defer already_checked_list.deinit();
 
         for (three_line_item[0]) |first_line_char| {
             for (three_line_item[1]) |second_line_char| {
@@ -31,9 +31,9 @@ pub fn main() !void {
                     if (first_line_char == second_line_char and second_line_char == third_line_char) {
                         const list_index_value = @intCast(u32, getIndexFromArray(priority_item_list, first_line_char));
 
-                        if (!contains(alreadyCheckedList, list_index_value)) {
+                        if (!contains(already_checked_list, list_index_value)) {
                             total_value += list_index_value + 1;
-                            try alreadyCheckedList.append(list_index_value);
+                            try already_checked_list.append(list_index_value);
                         }
                     }
                     // std.log.info("{s}", .{[3]u8{ first_line_char, second_line_char, third_line_char }});
@@ -53,9 +53,9 @@ fn populateArrayList(three_line_list: *ArrayListAligned([3][]const u8, null), li
     }
 }
 
-fn contains(source: ArrayListAligned(u32, null), target: u32) bool {
+fn contains(source: ArrayListAligned(u32, null), needle: u32) bool {
     return for (source.items) |sourceItem| {
-        if (sourceItem == target) {
+        if (sourceItem == needle) {
             break true;
         }
     } else false;

@@ -1,24 +1,49 @@
 const std = @import("std");
+const utils = @import("utils");
+const ArrayList = std.ArrayList;
+const ArrayListAligned = std.ArrayListAligned;
+const SplitIterator = std.mem.SplitIterator;
+
+const Range = struct {
+    start: u32,
+    end: u32,
+
+    pub fn isContained(self: *Range, other: Range) bool {
+        return (self.start <= other.start) and (self.end >= other.end);
+    }
+};
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var allocator = std.heap.page_allocator;
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    var list = ArrayList([]const u8).init(allocator);
+    try utils.getArrayListFromPath(allocator, &list, "src/input.txt");
+    defer list.deinit();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    var same_pairs: u64 = 0;
 
-    try bw.flush(); // don't forget to flush!
+    for (list.items) |item| {
+        var splitted_item: SplitIterator(u8, .any) = std.mem.splitAny(u8, item, ",");
+        const first_part: []const u8 = splitted_item.next() orelse "";
+        var first_range: Range = getRange(first_part);
+
+        const second_part: []const u8 = splitted_item.next() orelse "";
+        var second_range: Range = getRange(second_part);
+
+        if (first_range.isContained(second_range) or second_range.isContained(first_range)) {
+            same_pairs += 1;
+        }
+    }
+
+    std.log.info("same_pairs: {any}", .{same_pairs});
 }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+pub fn getRange(part: []const u8) Range {
+    var splitted_part = std.mem.splitAny(u8, part, "-");
+    return Range{ .start = getValueFromOptionalString(splitted_part.next()), .end = getValueFromOptionalString(splitted_part.next()) };
+}
+
+pub fn getValueFromOptionalString(opt_string: ?[]const u8) u32 {
+    var first_part = opt_string orelse "";
+    return std.fmt.parseInt(u32, first_part, 10) catch 0;
 }

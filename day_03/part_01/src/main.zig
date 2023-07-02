@@ -15,13 +15,13 @@ pub fn main() !void {
 
     var total_value: u32 = 0;
     for (list.items) |line| {
-        var alreadyCheckedList = ArrayList(u32).init(allocator);
-        defer alreadyCheckedList.deinit();
+        var already_checked_list = ArrayList(u32).init(allocator);
+        defer already_checked_list.deinit();
 
         var first_half: []const u8 = line[0 .. line.len / 2];
         var second_half: []const u8 = line[line.len / 2 .. line.len];
         for (first_half) |first_half_item| {
-            try checkValues(&alreadyCheckedList, &total_value, second_half, first_half_item);
+            try checkValues(&already_checked_list, &total_value, second_half, first_half_item);
         }
         log_line_info(total_value, line, first_half, second_half);
     }
@@ -29,7 +29,7 @@ pub fn main() !void {
     std.log.info("{d}", .{total_value});
 }
 
-fn checkValues(alreadyCheckedList: *ArrayListAligned(u32, null), total_value: *u32, source: []const u8, target: u8) !void {
+fn checkValues(already_checked_list: *ArrayListAligned(u32, null), total_value: *u32, source: []const u8, target: u8) !void {
     var allocator = std.heap.page_allocator;
     var list = ArrayList(u8).init(allocator);
     defer list.deinit();
@@ -38,9 +38,9 @@ fn checkValues(alreadyCheckedList: *ArrayListAligned(u32, null), total_value: *u
         if (item == target) {
             const list_index_value = @intCast(u32, getIndexFromArray(priority_item_list, item));
 
-            if (!contains(alreadyCheckedList, list_index_value)) {
+            if (!contains(already_checked_list, list_index_value)) {
                 total_value.* += list_index_value + 1;
-                try alreadyCheckedList.*.append(list_index_value);
+                try already_checked_list.*.append(list_index_value);
             }
         }
     }
