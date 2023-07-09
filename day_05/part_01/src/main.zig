@@ -1,24 +1,51 @@
 const std = @import("std");
+const utils = @import("utils");
+const ArrayList = std.ArrayList;
+const SplitIterator = std.mem.SplitIterator;
+
+const CrateAction = struct {
+    move: i16,
+    from: i16,
+    to: i16,
+};
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var allocator = std.heap.page_allocator;
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    var list = ArrayList([]const u8).init(allocator);
+    defer list.deinit();
+    try utils.getArrayListFromPath(allocator, &list, "src/input_demo.txt");
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    var structure = ArrayList([]u8).init(allocator);
+    defer structure.deinit();
 
-    try bw.flush(); // don't forget to flush!
+    var actions = ArrayList(CrateAction).init(allocator);
+    defer actions.deinit();
+
+    const actions_part_index = for (list.items, 0..) |item, index| {
+        if (item.len == 0) {
+            break index + 1;
+        }
+    } else 0;
+
+    for (list.items[0 .. actions_part_index - 1]) |item| {
+        std.log.info("{any}", .{item});
+    }
+
+    for (list.items[actions_part_index..]) |item| {
+        var split_item: SplitIterator(u8, .any) = std.mem.splitAny(u8, item[4..], " ");
+        const first_part: []const u8 = getValueFromSplit(&split_item) orelse "";
+        const second_part: []const u8 = getValueFromSplit(&split_item) orelse "";
+        const third_part: []const u8 = getValueFromSplit(&split_item) orelse "";
+        try actions.append(CrateAction{ .move = try std.fmt.parseInt(i16, first_part, 10), .from = try std.fmt.parseInt(i16, second_part, 10), .to = try std.fmt.parseInt(i16, third_part, 10) });
+    }
+
+    for (actions.items) |item| {
+        std.log.info("{any}", .{item});
+    }
 }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+pub fn getValueFromSplit(split_item: *SplitIterator(u8, .any)) ?[]const u8 {
+    _ = split_item.next();
+    return split_item.next();
 }
