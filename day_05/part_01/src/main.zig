@@ -17,7 +17,7 @@ pub fn main() !void {
     defer list.deinit();
     try utils.getArrayListFromPath(allocator, &list, "src/input.txt");
 
-    var structure = AutoHashMap(u8, ArrayList(u8)).init(allocator);
+    var structure: AutoHashMap(u8, ArrayList(u8)) = AutoHashMap(u8, ArrayList(u8)).init(allocator);
     defer structure.deinit();
 
     var actions = ArrayList(CrateAction).init(allocator);
@@ -68,13 +68,7 @@ pub fn main() !void {
     }
 
     // Logs the current crate structure
-    for (1..crates_index + 1) |index| {
-        if (structure.get(@intCast(index))) |item| {
-            for (item.items) |box| {
-                std.log.info("box: {d} {c}", .{ index, box });
-            }
-        }
-    }
+    logStructure(crates_index, structure);
 
     // Moves the crates
     for (actions.items) |action| {
@@ -98,6 +92,10 @@ pub fn main() !void {
     }
 
     // Logs the new crate structure
+    logStructure(crates_index, structure);
+}
+
+pub fn logStructure(crates_index: u8, structure: AutoHashMap(u8, ArrayList(u8))) void {
     for (1..crates_index + 1) |index| {
         if (structure.get(@intCast(index))) |item| {
             for (item.items) |box| {
