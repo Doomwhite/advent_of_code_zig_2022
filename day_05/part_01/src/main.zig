@@ -46,7 +46,7 @@ pub fn main() !void {
         var structure_column_index: u8 = 1;
 
         // Interates the crates boxes and populates the crates box by box
-        while (crate_column_index != crate_row.len and crate_column_index < crate_row.len) : ({
+        while (crate_column_index < crate_row.len) : ({
             crate_column_index += 4;
             structure_column_index += 1;
         }) {
