@@ -29,7 +29,7 @@ pub fn main() !void {
                 for (three_line_item[2]) |third_line_char| {
                     index += 1;
                     if (first_line_char == second_line_char and second_line_char == third_line_char) {
-                        const list_index_value = @intCast(u32, getIndexFromArray(priority_item_list, first_line_char));
+                        const list_index_value: u32 = @intCast(getIndexFromArray(priority_item_list, first_line_char));
 
                         if (!contains(already_checked_list, list_index_value)) {
                             total_value += list_index_value + 1;

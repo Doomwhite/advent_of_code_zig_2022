@@ -23,8 +23,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    
-    const utilsModule = b.addModule("utils", .{ .source_file = .{ .path = "src/utils/utils.zig" } });
+
+    const utilsModule = b.addModule("utils", .{ .source_file = .{ .path = "../../utils/utils.zig" } });
     exe.addModule("utils", utilsModule);
 
     // This declares intent for the executable to be installed into the

@@ -36,7 +36,7 @@ fn checkValues(already_checked_list: *ArrayListAligned(u32, null), total_value: 
 
     for (source) |item| {
         if (item == target) {
-            const list_index_value = @intCast(u32, getIndexFromArray(priority_item_list, item));
+            const list_index_value: u32 = @intCast(getIndexFromArray(priority_item_list, item));
 
             if (!contains(already_checked_list, list_index_value)) {
                 total_value.* += list_index_value + 1;

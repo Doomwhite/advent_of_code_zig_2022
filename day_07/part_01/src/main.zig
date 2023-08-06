@@ -1,24 +1,45 @@
 const std = @import("std");
+const utils = @import("utils");
+const BoundedArray = std.BoundedArray;
+
+const min_char_count_for_marker: comptime_int = 4;
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var list = try BoundedArray(u8, min_char_count_for_marker).init(min_char_count_for_marker);
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    const string: []const u8 = utils.getStringFromPath("src/input.txt") catch "";
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    const index = for_loop: for (string, 0..) |character, char_index| {
+        std.log.info("{any}", .{char_index});
+        if (list.len != min_char_count_for_marker) {
+            try list.append(character);
+        } else {
+            const replaced_array: []const u8 = &list.buffer[1..].* ++ [1]u8{character};
+            try list.replaceRange(0, min_char_count_for_marker, replaced_array);
+        }
+        std.log.info("{s}", .{list.buffer});
+        if (char_index > min_char_count_for_marker) {
+            var is_different_count: u8 = 0;
+            for (list.buffer, 0..) |list_item, item_index| {
+                var char_is_different_count: u8 = 0;
 
-    try bw.flush(); // don't forget to flush!
-}
+                for (list.buffer, 0..) |second_list_item, second_item_index| {
+                    if (item_index == second_item_index) {
+                        continue;
+                    }
+                    if (list_item != second_list_item) {
+                        char_is_different_count += 1;
+                    }
+                }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+                if (char_is_different_count == min_char_count_for_marker - 1) {
+                    is_different_count += 1;
+                }
+            }
+            if (is_different_count == min_char_count_for_marker) {
+                break :for_loop char_index + 1;
+            }
+        }
+    } else 0;
+    std.log.info("index: {any}", .{index});
 }
