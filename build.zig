@@ -5,12 +5,12 @@ const std = @import("std");
 // runner.
 
 pub fn build(b: *std.Build) void {
-    const day: ?u6 = b.option(u6, "day", "The day of advent of code");
+    const day: ?u6 = b.option(u6, "d", "The day of advent of code");
     if (day) |day_value| {
         if ((day_value > 25) or (day_value == 0)) unreachable;
     }
 
-    const part: ?u2 = b.option(u2, "part", "The part of the day of advent of code");
+    const part: ?u2 = b.option(u2, "p", "The part of the day of advent of code");
     if (part) |part_value| {
         if (part_value == 0) unreachable;
     }
