@@ -2,12 +2,14 @@ const std = @import("std");
 const utils = @import("utils");
 const BoundedArray = std.BoundedArray;
 
+const src = @import("config").src;
+
 const min_char_count_for_marker: comptime_int = 4;
 
 pub fn main() !void {
     var list = try BoundedArray(u8, min_char_count_for_marker).init(min_char_count_for_marker);
 
-    const string: []const u8 = utils.getStringFromPath("src/input.txt") catch "";
+    const string: []const u8 = utils.getStringFromPath(src ++ "src/input.txt") catch "";
 
     const index = for_loop: for (string, 0..) |character, char_index| {
         std.log.info("{any}", .{char_index});

@@ -7,10 +7,12 @@ const ComptimeStringMap = std.ComptimeStringMap;
 
 const priority_item_list = [_]u8{ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
+const src = @import("config").src;
+
 pub fn main() !void {
     var allocator = std.heap.page_allocator;
     var list = ArrayList([]const u8).init(allocator);
-    try utils.getArrayListFromPath(allocator, &list, "src/input.txt");
+    try utils.getArrayListFromPath(allocator, &list, src ++ "src/input.txt");
     defer list.deinit();
 
     var total_value: u32 = 0;

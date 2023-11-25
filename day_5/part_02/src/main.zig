@@ -4,6 +4,8 @@ const ArrayList = std.ArrayList;
 const AutoHashMap = std.AutoHashMap;
 const SplitIterator = std.mem.SplitIterator;
 
+const src = @import("config").src;
+
 const CrateAction = struct {
     move: u16,
     from: u8,
@@ -15,7 +17,7 @@ pub fn main() !void {
 
     var list = ArrayList([]const u8).init(allocator);
     defer list.deinit();
-    try utils.getArrayListFromPath(allocator, &list, "src/input.txt");
+    try utils.getArrayListFromPath(allocator, &list, src ++ "src/input.txt");
 
     var structure: AutoHashMap(u8, ArrayList(u8)) = AutoHashMap(u8, ArrayList(u8)).init(allocator);
     defer structure.deinit();

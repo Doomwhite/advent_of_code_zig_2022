@@ -4,55 +4,30 @@ const std = @import("std");
 // declaratively construct a build graph that will be executed by an external
 // runner.
 
-pub fn build(b: *std.Build) void {
-    const paths = [25][2][]const u8{
-        [2][]const u8{ "day_1/part_01/src/main.zig", "day_1/part_02/src/main.zig" },
-        [2][]const u8{ "day_2/part_01/src/main.zig", "day_2/part_02/src/main.zig" },
-        [2][]const u8{ "day_3/part_01/src/main.zig", "day_3/part_02/src/main.zig" },
-        [2][]const u8{ "day_4/part_01/src/main.zig", "day_4/part_02/src/main.zig" },
-        [2][]const u8{ "day_5/part_01/src/main.zig", "day_5/part_02/src/main.zig" },
-        [2][]const u8{ "day_6/part_01/src/main.zig", "day_6/part_02/src/main.zig" },
-        [2][]const u8{ "day_7/part_01/src/main.zig", "day_7/part_02/src/main.zig" },
-        [2][]const u8{ "day_8/part_01/src/main.zig", "day_8/part_02/src/main.zig" },
-        [2][]const u8{ "day_9/part_01/src/main.zig", "day_9/part_02/src/main.zig" },
-        [2][]const u8{ "day_10/part_01/src/main.zig", "day_10/part_02/src/main.zig" },
-        [2][]const u8{ "day_11/part_01/src/main.zig", "day_11/part_02/src/main.zig" },
-        [2][]const u8{ "day_12/part_01/src/main.zig", "day_12/part_02/src/main.zig" },
-        [2][]const u8{ "day_13/part_01/src/main.zig", "day_13/part_02/src/main.zig" },
-        [2][]const u8{ "day_14/part_01/src/main.zig", "day_14/part_02/src/main.zig" },
-        [2][]const u8{ "day_15/part_01/src/main.zig", "day_15/part_02/src/main.zig" },
-        [2][]const u8{ "day_16/part_01/src/main.zig", "day_16/part_02/src/main.zig" },
-        [2][]const u8{ "day_17/part_01/src/main.zig", "day_17/part_02/src/main.zig" },
-        [2][]const u8{ "day_18/part_01/src/main.zig", "day_18/part_02/src/main.zig" },
-        [2][]const u8{ "day_19/part_01/src/main.zig", "day_19/part_02/src/main.zig" },
-        [2][]const u8{ "day_20/part_01/src/main.zig", "day_20/part_02/src/main.zig" },
-        [2][]const u8{ "day_21/part_01/src/main.zig", "day_21/part_02/src/main.zig" },
-        [2][]const u8{ "day_22/part_01/src/main.zig", "day_22/part_02/src/main.zig" },
-        [2][]const u8{ "day_23/part_01/src/main.zig", "day_23/part_02/src/main.zig" },
-        [2][]const u8{ "day_24/part_01/src/main.zig", "day_24/part_02/src/main.zig" },
-        [2][]const u8{ "day_25/part_01/src/main.zig", "day_25/part_02/src/main.zig" },
-    };
+const ComputationError = error{
+    OutOfRange,
+};
+
+pub fn build(b: *std.Build) !void {
+    const alloc = std.heap.page_allocator;
 
     const day: ?u6 = b.option(u6, "d", "The day of advent of code");
-    var part: ?u2 = undefined;
+    const part: u2 = b.option(u2, "p", "The part of the day of advent of code") orelse 1;
     if (day) |day_value| {
-        if ((day_value > 25) or (day_value == 0)) unreachable;
-
-        part = b.option(u2, "p", "The part of the day of advent of code");
-        if (part) |part_value| {
-            if (part_value == 0) unreachable;
-        }
+        if ((day_value > 25) or (day_value == 0)) return ComputationError.OutOfRange;
     }
+    if (part == 0) unreachable;
 
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     if (day) |day_value| {
-        const day_string: []const u8 = getDayString(day_value);
+        const path: []const u8 = try getPath(alloc, day_value, part);
+
+        // Check file exists
+        try std.fs.cwd().access(path, .{});
         const exe = b.addExecutable(.{
-            .name = day_string,
-            // In this case the main source file is merely a path, however, in more
-            // complicated build scripts, this could be a generated file.
-            .root_source_file = .{ .path = paths[4][0] },
+            .name = "day",
+            .root_source_file = .{ .path = path },
             .target = target,
             .optimize = optimize,
         });
@@ -66,13 +41,17 @@ pub fn build(b: *std.Build) void {
 
         const run_step = b.step("run", "Run the app");
         run_step.dependOn(&run_cmd.step);
+
+        const options = b.addOptions();
+        const src = std.fmt.allocPrint(alloc, "day_{d}/part_0{d}/", .{ day_value, part }) catch unreachable;
+        options.addOption([]const u8, "src", src);
+        exe.addOptions("config", options);
+
+        const utilsModule = b.addModule("utils", .{ .source_file = .{ .path = "utils/utils.zig" } });
+        exe.addModule("utils", utilsModule);
     }
 }
 
-pub fn getDayString(day_value: u6) []const u8 {
-    return "day_" ++ [1]u8{@as(u8, @intCast(day_value))};
-}
-
-pub fn getDayPath(day_value: u6) []const u8 {
-    return "day_" ++ [1]u8{@as(u8, @intCast(day_value))} ++ "/src";
+fn getPath(alloc: std.mem.Allocator, day: u6, part: u2) ![]const u8 {
+    return try std.fmt.allocPrint(alloc, "day_{d}/part_0{d}/src/main.zig", .{ day, part });
 }

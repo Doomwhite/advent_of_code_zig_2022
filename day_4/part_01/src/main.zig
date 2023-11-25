@@ -4,6 +4,8 @@ const ArrayList = std.ArrayList;
 const ArrayListAligned = std.ArrayListAligned;
 const SplitIterator = std.mem.SplitIterator;
 
+const src = @import("config").src;
+
 const Range = struct {
     start: u32,
     end: u32,
@@ -17,7 +19,7 @@ pub fn main() !void {
     var allocator = std.heap.page_allocator;
 
     var list = ArrayList([]const u8).init(allocator);
-    try utils.getArrayListFromPath(allocator, &list, "src/input.txt");
+    try utils.getArrayListFromPath(allocator, &list, src ++ "src/input.txt");
     defer list.deinit();
 
     var same_pairs: u64 = 0;
